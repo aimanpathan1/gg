@@ -252,7 +252,7 @@ class Mage_Dataflow_Model_Convert_Parser_Csv extends Mage_Dataflow_Model_Convert
      * Retrieve csv string from array
      *
      * @param array $fields
-     * @return string
+     * @return sting
      */
     public function getCsvString($fields = array()) {
         $delimiter  = $this->getVar('delimiter', ',');
@@ -264,11 +264,8 @@ class Mage_Dataflow_Model_Convert_Parser_Csv extends Mage_Dataflow_Model_Convert
         }
 
         $str = '';
+
         foreach ($fields as $value) {
-
-            $escapedValue = Mage::helper("core")->getEscapedCSVData(array($value));
-            $value = $escapedValue[0];
-
             if (strpos($value, $delimiter) !== false ||
                 empty($enclosure) ||
                 strpos($value, $enclosure) !== false ||

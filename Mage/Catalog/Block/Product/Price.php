@@ -95,7 +95,7 @@ class Mage_Catalog_Block_Product_Price extends Mage_Core_Block_Template
                     $productPrice = $groupPrice;
                 }
 
-                if ($price['price'] <= $productPrice) {
+                if ($price['price'] < $productPrice) {
                     $price['savePercent'] = ceil(100 - ((100 / $productPrice) * $price['price']));
 
                     $tierPrice = Mage::app()->getStore()->convertPrice(

@@ -45,7 +45,7 @@ class Enterprise_GiftCardAccount_Block_Adminhtml_Giftcardaccount_Edit_Tab_Info e
         );
 
         if ($model->getId()){
-            $fieldset->addField('code', 'text', array(
+            $fieldset->addField('code', 'label', array(
                 'name'      => 'code',
                 'label'     => Mage::helper('enterprise_giftcardaccount')->__('Gift Card Code'),
                 'title'     => Mage::helper('enterprise_giftcardaccount')->__('Gift Card Code')

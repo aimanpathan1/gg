@@ -74,8 +74,6 @@ class Enterprise_GiftCardAccount_Model_Giftcardaccount extends Mage_Core_Model_A
 
     protected $_defaultPoolModelClass = 'enterprise_giftcardaccount/pool';
 
-    protected $_updatePool = null;
-
     /**
      * Static variable to contain codes, that were saved on previous steps in series of consecutive saves
      * Used if you use different read and write connections
@@ -114,12 +112,6 @@ class Enterprise_GiftCardAccount_Model_Giftcardaccount extends Mage_Core_Model_A
                 else {
                     $this->setState(self::STATE_USED);
                 }
-            }
-
-            if (isset($this->_origData['code'])
-                    && !empty($this->_origData['code'])
-                    && $this->_origData['code'] != $this->_data['code']) {
-                $this->_updatePool = $this->_origData['code'];
             }
         }
 
@@ -162,15 +154,6 @@ class Enterprise_GiftCardAccount_Model_Giftcardaccount extends Mage_Core_Model_A
                 ->setStatus(Enterprise_GiftCardAccount_Model_Pool_Abstract::STATUS_USED)
                 ->save();
             self::$_alreadySelectedIds[] = $this->getCode();
-        }
-
-        if ($this->_updatePool) {
-            /** @var $write Varien_Db_Adapter_Pdo_Mysql */
-            $write = Mage::getSingleton('core/resource')->getConnection('write');
-            $resource = $this->getPoolModel()->getResource();
-            $table = $resource->getTable('pool');
-            $sql = "UPDATE {$table} SET code = '{$this->getCode()}' WHERE code = '{$this->_updatePool}' ";
-            $updated = $write->exec($sql);
         }
 
         parent::_afterSave();

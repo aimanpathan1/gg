@@ -290,14 +290,14 @@
                     </enterprise_pagecache_compare_list_change>
                 </observers>
             </customer_login>
-            <controller_action_postdispatch_customer_account_logoutsuccess>
+            <controller_action_postdispatch_customer_account_logoutSuccess>
                 <observers>
                     <enterprise_pagecache>
                         <class>enterprise_pagecache/observer</class>
                         <method>customerLogout</method>
                     </enterprise_pagecache>
                 </observers>
-            </controller_action_postdispatch_customer_account_logoutsuccess>
+            </controller_action_postdispatch_customer_account_logoutSuccess>
             <sales_quote_save_after>
                 <observers>
                     <enterprise_pagecache>

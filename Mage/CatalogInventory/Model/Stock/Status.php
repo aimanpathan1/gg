@@ -514,11 +514,10 @@ class Mage_CatalogInventory_Model_Stock_Status extends Mage_Core_Model_Abstract
      */
     public function prepareCatalogProductIndexSelect(Varien_Db_Select $select, $entityField, $websiteField)
     {
-        $exc = new Exception('stop here');
-        Mage::log('prepareCatalogProductIndexSelect '. $exc->getTraceAsString(),null,'stock.log',true);
         if (Mage::helper('cataloginventory')->isShowOutOfStock()) {
             return $this;
         }
+
         $this->_getResource()->prepareCatalogProductIndexSelect($select, $entityField, $websiteField);
 
         return $this;

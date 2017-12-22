@@ -99,18 +99,18 @@ class Enterprise_Search_Model_Catalog_Layer_Filter_Price extends Mage_Catalog_Mo
             }
 
             if (!$isAuto && !empty($facets)) {
-                $range = $this->getPriceRange();
+                $range  = $this->getPriceRange();
             }
 
             $i = 0;
             $maxIntervalsNumber = $this->getMaxIntervalsNumber();
             $lastSeparator = null;
             foreach ($facets as $key => $count) {
-                if (!preg_match('/\[([\d\.\*]+) TO ([\d\.\*]+)\]$/', $key, $separator)) {
-                    continue;
-                }
-
                 ++$i;
+                preg_match('/\[([\d\.\\\*]+) TO ([\d\.\\\*]+)\]$/', $key, $separator);
+                $separator[1] = str_replace('\\*', '*', $separator[1]);
+                $separator[2] = str_replace('\\*', '*', $separator[2]);
+
                 $label = null;
                 $value = null;
                 if (isset($this->_facets[$separator[1] . '_' . $separator[2]])) {

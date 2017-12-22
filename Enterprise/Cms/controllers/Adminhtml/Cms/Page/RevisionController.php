@@ -390,8 +390,7 @@ class Enterprise_Cms_Adminhtml_Cms_Page_RevisionController extends Enterprise_Cm
      */
     protected function _isAllowed()
     {
-        $action = strtolower($this->getRequest()->getActionName());
-        switch ($action) {
+        switch ($this->getRequest()->getActionName()) {
             case 'save':
                 return Mage::getSingleton('enterprise_cms/config')->canCurrentUserSaveRevision();
                 break;
@@ -414,8 +413,7 @@ class Enterprise_Cms_Adminhtml_Cms_Page_RevisionController extends Enterprise_Cm
      */
     public function preDispatch()
     {
-        $action = strtolower($this->getRequest()->getActionName());
-        if ($action == 'drop') {
+        if ($this->getRequest()->getActionName() == 'drop') {
             $this->_currentArea = 'frontend';
         }
         parent::preDispatch();

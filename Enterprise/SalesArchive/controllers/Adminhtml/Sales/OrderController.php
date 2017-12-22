@@ -40,8 +40,7 @@ class Enterprise_SalesArchive_Adminhtml_Sales_OrderController extends Mage_Admin
      */
     protected function _isAllowed()
     {
-        $action = strtolower($this->getRequest()->getActionName());
-        if ($action == 'view') {
+        if ($this->getRequest()->getActionName() == 'view') {
             $id = $this->getRequest()->getParam('order_id');
             $archive = Mage::getModel('enterprise_salesarchive/archive');
             $ids = $archive->getIdsInArchive(Enterprise_SalesArchive_Model_Archive::ORDER, $id);

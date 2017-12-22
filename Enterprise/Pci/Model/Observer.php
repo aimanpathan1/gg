@@ -170,51 +170,16 @@ class Enterprise_Pci_Model_Observer
     /**
      * Harden admin password change.
      *
-     * @deprecated
-     *
-     * @param Varien_Event_Observer $observer
-     */
-    public function checkAdminPasswordChange($observer)
-    {
-        $observer->getEvent()->setUser($observer->getEvent()->getObject());
-        $this->validateAdminUser($observer);
-        $errors = $observer->getEvent()->getErrors();
-        if (count($errors) != 0) {
-            foreach ($errors as $errorMessage) {
-                Mage::throwException($errorMessage);
-            }
-        }
-    }
-
-    /**
-     * Harden admin password change.
-     *
      * New password must be minimum 7 chars length and include alphanumeric characters
      * The password is compared to at least last 4 previous passwords to prevent setting them again
      *
      * @param Varien_Event_Observer $observer
+     * @throws Mage_Core_Exception
      */
-    public function validateAdminUser($observer)
+    public function checkAdminPasswordChange($observer)
     {
-        /** @var Varien_Event $event */
-        $event = $observer->getEvent();
-
-        /**
-         * Admin user model.
-         *
-         * @var Mage_Admin_Model_User
-         */
-        $user = $event->getUser();
-        if (is_null($event->getErrors())) {
-            $event->setErrors(new ArrayObject());
-        }
-
-        /**
-         * Errors container object.
-         * 
-         * @var ArrayObject
-         */
-        $errors = $event->getErrors();
+        /* @var $user Mage_Admin_Model_User */
+        $user = $observer->getEvent()->getObject();
 
         if ($user->getNewPassword()) {
             $password = $user->getNewPassword();
@@ -224,15 +189,15 @@ class Enterprise_Pci_Model_Observer
 
         if ($password && !$user->getForceNewPassword() && $user->getId()) {
             if (Mage::helper('core')->validateHash($password, $user->getOrigData('password'))) {
-                $errors[] = Mage::helper('enterprise_pci')->__('This password was used earlier, try another one.');
-                return;
+                Mage::throwException(Mage::helper('enterprise_pci')->__('This password was used earlier, try another one.'));
             }
 
-            $resource = Mage::getResourceSingleton('enterprise_pci/admin_user');
+            // check whether password was used before
+            $resource     = Mage::getResourceSingleton('enterprise_pci/admin_user');
+            $passwordHash = Mage::helper('core')->getHash($password, false);
             foreach ($resource->getOldPasswords($user) as $oldPasswordHash) {
-                if (Mage::helper('core')->validateHash($password, $oldPasswordHash)) {
-                    $errors[] = Mage::helper('enterprise_pci')->__('This password was used earlier, try another one.');
-                    return;
+                if ($passwordHash === $oldPasswordHash) {
+                    Mage::throwException(Mage::helper('enterprise_pci')->__('This password was used earlier, try another one.'));
                 }
             }
         }

@@ -85,15 +85,6 @@
                 </observers>
             </catalogsearch_index_process_start>
 
-            <catelogsearch_searchable_attributes_load_after>
-                <observers>
-                    <enterprise_search>
-                        <class>enterprise_search/observer</class>
-                        <method>storeSearchableAttributes</method>
-                    </enterprise_search>
-                </observers>
-            </catelogsearch_searchable_attributes_load_after>
-
             <catalogsearch_index_process_complete>
                 <observers>
                     <enterprise_search>
@@ -134,6 +125,15 @@
                     </enterprise_search>
                 </observers>
             </adminhtml_catalog_product_attribute_edit_prepare_form>
+
+            <catelogsearch_searchable_attributes_load_after>
+                <observers>
+                    <enterprise_search>
+                        <class>enterprise_search/observer</class>
+                        <method>storeSearchableAttributes</method>
+                    </enterprise_search>
+                </observers>
+            </catelogsearch_searchable_attributes_load_after>
 
             <catalogsearch_query_save_after>
                 <observers>

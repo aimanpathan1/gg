@@ -137,16 +137,15 @@ class Enterprise_Logging_Adminhtml_LoggingController extends Mage_Adminhtml_Cont
      */
     protected function _isAllowed()
     {
-        $action = strtolower($this->getRequest()->getActionName());
-        switch ($action) {
+        switch ($this->getRequest()->getActionName()) {
             case 'archive':
             case 'download':
-            case 'archivegrid':
+            case 'archiveGrid':
                 return Mage::getSingleton('admin/session')->isAllowed('admin/system/enterprise_logging/backups');
                 break;
             case 'grid':
-            case 'exportcsv':
-            case 'exportxml':
+            case 'exportCsv':
+            case 'exportXml':
             case 'details':
             case 'index':
                 return Mage::getSingleton('admin/session')->isAllowed('admin/system/enterprise_logging/events');

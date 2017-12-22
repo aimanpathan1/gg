@@ -81,7 +81,7 @@ class Mage_Checkout_OnepageController extends Mage_Checkout_Controller_Action
             $this->_ajaxRedirectResponse();
             return true;
         }
-        $action = strtolower($this->getRequest()->getActionName());
+        $action = $this->getRequest()->getActionName();
         if (Mage::getSingleton('checkout/session')->getCartWasUpdated(true)
             && !in_array($action, array('index', 'progress'))) {
             $this->_ajaxRedirectResponse();
@@ -160,7 +160,6 @@ class Mage_Checkout_OnepageController extends Mage_Checkout_Controller_Action
      */
     public function indexAction()
     {
-        Mage::log($this->getFullActionName(),null,'onepage',true);
         if (!Mage::helper('checkout')->canOnepageCheckout()) {
             Mage::getSingleton('checkout/session')->addError($this->__('The onepage checkout is disabled.'));
             $this->_redirect('checkout/cart');
@@ -351,8 +350,6 @@ class Mage_Checkout_OnepageController extends Mage_Checkout_Controller_Action
      */
     public function saveShippingAction()
     {
-        Mage::log($this->getFullActionName(),null,'onepage',true);
-
         if ($this->_expireAjax()) {
             return;
         }

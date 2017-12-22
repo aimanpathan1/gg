@@ -194,9 +194,9 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
     {
         $controller->setShowCodePoolStatusMessage(false);
         if (!$this->_role->getIsWebsiteLevel()) {
-            $actionName = strtolower($controller->getRequest()->getActionName());
-            if (in_array($actionName, array('new', 'generate'))
-                || $actionName == 'edit' && !$controller->getRequest()->getParam('id')) {
+            $action = $controller->getRequest()->getActionName();
+            if (in_array($action, array('new', 'generate'))
+                || $action == 'edit' && !$controller->getRequest()->getParam('id')) {
                 return $this->_forward();
             }
         }
@@ -210,8 +210,7 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
     public function validateCatalogCategories($controller)
     {
         $forward = false;
-        $actionName = strtolower($controller->getRequest()->getActionName());
-        switch ($actionName) {
+        switch ($controller->getRequest()->getActionName()) {
             case 'add':
                 /**
                  * adding is not allowed from begining if user has scope specified permissions
@@ -270,8 +269,7 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
     {
         // instead of generic (we are capped by allowed store groups root categories)
         // check whether attempting to create event for wrong category
-        $actionName = strtolower($this->_request->getActionName());
-        if ('new' === $actionName) {
+        if ('new' === $this->_request->getActionName()) {
             $category = Mage::getModel('catalog/category')->load($this->_request->getParam('category_id'));
             if (($this->_request->getParam('category_id') && !$this->_isCategoryAllowed($category)) ||
                 !$this->_role->getIsWebsiteLevel()) {
@@ -341,9 +339,8 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
         if (!is_array($denyActions)) {
             $denyActions = array($denyActions);
         }
-        $actionName = strtolower($this->_request->getActionName());
-        if ((!$this->_role->getWebsiteIds()) && (in_array($actionName, $denyActions)
-            || ($saveAction === $actionName && 0 == $this->_request->getParam($idFieldName)))) {
+        if ((!$this->_role->getWebsiteIds()) && (in_array($this->_request->getActionName(), $denyActions)
+            || ($saveAction === $this->_request->getActionName() && 0 == $this->_request->getParam($idFieldName)))) {
             $this->_forward();
             return false;
         }
@@ -357,18 +354,17 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
      */
     public function validateSystemStore($controller)
     {
-        $actionName = strtolower($this->_request->getActionName());
         // due to design of the original controller, need to run this check only once, on the first dispatch
         if (Mage::registry('enterprise_admingws_system_store_matched')) {
             return;
-        } elseif (in_array($actionName, array('save', 'newwebsite', 'newgroup', 'newstore',
-            'editwebsite', 'editgroup', 'editstore', 'deletewebsite', 'deletewebsitepost', 'deletegroup',
-            'deletegrouppost', 'deletestore', 'deletestorepost'
+        } elseif (in_array($this->_request->getActionName(), array('save', 'newWebsite', 'newGroup', 'newStore',
+            'editWebsite', 'editGroup', 'editStore', 'deleteWebsite', 'deleteWebsitePost', 'deleteGroup',
+            'deleteGroupPost', 'deleteStore', 'deleteStorePost'
             ))) {
             Mage::register('enterprise_admingws_system_store_matched', true, true);
         }
 
-        switch ($actionName) {
+        switch ($this->_request->getActionName()) {
             case 'save':
                 $params = $this->_request->getParams();
                 if (isset($params['website'])) {
@@ -381,36 +377,36 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
                     // preventing saving stores/groups for wrong website is handled by their models
                 }
                 break;
-            case 'newwebsite':
+            case 'newWebsite':
                 return $this->_forward();
                 break;
-            case 'newgroup': // break intentionally omitted
-            case 'newstore':
+            case 'newGroup': // break intentionally omitted
+            case 'newStore':
                 if (!$this->_role->getWebsiteIds()) {
                     return $this->_forward();
                 }
                 break;
-            case 'editwebsite':
+            case 'editWebsite':
                 if (!$this->_role->hasWebsiteAccess($this->_request->getParam('website_id'))) {
                     return $this->_forward();
                 }
                 break;
-            case 'editgroup':
+            case 'editGroup':
                 if (!$this->_role->hasStoreGroupAccess($this->_request->getParam('group_id'))) {
                     return $this->_forward();
                 }
                 break;
-            case 'editstore':
+            case 'editStore':
                 if (!$this->_role->hasStoreAccess($this->_request->getParam('store_id'))) {
                     return $this->_forward();
                 }
                 break;
-            case 'deletewebsite': // break intentionally omitted
-            case 'deletewebsitepost':
+            case 'deleteWebsite': // break intentionally omitted
+            case 'deleteWebsitePost':
                 return $this->_forward();
                 break;
-            case 'deletegroup': // break intentionally omitted
-            case 'deletegrouppost':
+            case 'deleteGroup': // break intentionally omitted
+            case 'deleteGroupPost':
                 if ($group = $this->_role->getGroup($this->_request->getParam('item_id'))) {
                     if ($this->_role->hasWebsiteAccess($group->getWebsiteId(), true)) {
                         return;
@@ -418,8 +414,8 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
                 }
                 return $this->_forward();
                 break;
-            case 'deletestore': // break intentionally omitted
-            case 'deletestorepost':
+            case 'deleteStore': // break intentionally omitted
+            case 'deleteStorePost':
                 if ($store = Mage::app()->getStore($this->_request->getParam('item_id'))) {
                     if ($this->_role->hasWebsiteAccess($store->getWebsiteId(), true)) {
                         return;
@@ -459,9 +455,8 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
      */
     protected function _forward($action = 'denied', $module = null, $controller = null)
     {
-        $actionName = strtolower($this->_request->getActionName());
         // avoid cycling
-        if ($actionName === $action
+        if ($this->_request->getActionName() === $action
             && (null === $module || $this->_request->getModuleName() === $module)
             && (null === $controller || $this->_request->getControllerName() === $controller)) {
             return;
@@ -980,8 +975,7 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
      */
     public function validateManageCurrencyRates($controller)
     {
-        $actionName = strtolower($controller->getRequest()->getActionName());
-        if (in_array($actionName, array('fetchrates', 'saverates'))) {
+        if (in_array($controller->getRequest()->getActionName(), array('fetchRates', 'saveRates'))) {
             $this->_forward();
             return false;
         }
@@ -998,8 +992,7 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
      */
     public function validateTransactionalEmails($controller)
     {
-        $actionName = strtolower($controller->getRequest()->getActionName());
-        if (in_array($actionName, array('delete', 'save', 'new'))) {
+        if (in_array($controller->getRequest()->getActionName(), array('delete', 'save', 'new'))) {
             $this->_forward();
             return false;
         }
@@ -1060,7 +1053,7 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
      */
     public function validateCustomerAttributeActions($controller)
     {
-        $actionName = strtolower($this->_request->getActionName());
+        $actionName = $this->_request->getActionName();
         $attributeId = $this->_request->getParam('attribute_id');
         $websiteId = $this->_request->getParam('website');
         if (in_array($actionName, array('new', 'delete'))
@@ -1085,7 +1078,7 @@ class Enterprise_AdminGws_Model_Controllers extends Enterprise_AdminGws_Model_Ob
         $denyActions = array('edit', 'new', 'delete', 'save', 'run', 'match');
         $denyChangeDataActions = array('delete', 'save', 'run', 'match');
         $denyCreateDataActions = array('save');
-        $actionName  = strtolower($request->getActionName());
+        $actionName  = $request->getActionName();
 
         // Deny access if role has no allowed website ids and there are considering actions to deny
         if (!$this->_role->getWebsiteIds() && in_array($actionName, $denyActions)) {

@@ -106,7 +106,6 @@
                         <customer_account_confirmation/>
                         <customer_account_resetpassword/>
                         <customer_account_resetpasswordpost/>
-                        <customer_account_changeforgotten/>
                         <paypal_ipn_standard/>
                         <paypal_ipn_express/>
                         <paypal_ipn_direct/>

@@ -781,8 +781,6 @@ class Mage_CatalogInventory_Model_Observer
     /**
      * Update items stock status and low stock date.
      *
-     * @deprecated
-     *
      * @param Varien_Event_Observer $observer
      * @return  Mage_CatalogInventory_Model_Observer
      */
@@ -791,19 +789,6 @@ class Mage_CatalogInventory_Model_Observer
         Mage::getResourceSingleton('cataloginventory/stock')->updateSetOutOfStock();
         Mage::getResourceSingleton('cataloginventory/stock')->updateSetInStock();
         Mage::getResourceSingleton('cataloginventory/stock')->updateLowStockDate();
-        return $this;
-    }
-
-    /**
-     * Invalidate cataloginventory_stock indexer on catalog inventory config save
-     *
-     * @param $observer
-     * @return $this
-     */
-    public function invalidateStockIndexerUponConfigChange($observer)
-    {
-        Mage::getSingleton('index/indexer')->getProcessByCode('cataloginventory_stock')
-            ->changeStatus(Mage_Index_Model_Process::STATUS_REQUIRE_REINDEX);
         return $this;
     }
 
@@ -873,35 +858,6 @@ class Mage_CatalogInventory_Model_Observer
 
         Mage::getSingleton('cataloginventory/stock_status')
             ->prepareCatalogProductIndexSelect($select, $entity, $website);
-
-        return $this;
-    }
-
-    /**
-     * Add stock status filter to select
-     *
-     * @param Varien_Event_Observer $observer
-     * @return Mage_CatalogInventory_Model_Observer
-     */
-    public function addStockStatusFilterToSelect(Varien_Event_Observer $observer)
-    {
-        $select         = $observer->getEvent()->getSelect();
-        $entityField    = $observer->getEvent()->getEntityField();
-        $websiteField   = $observer->getEvent()->getWebsiteField();
-
-        if ($entityField === null || $websiteField === null) {
-            return $this;
-        }
-
-        if (!($entityField instanceof Zend_Db_Expr)) {
-            $entityField = new Zend_Db_Expr($entityField);
-        }
-        if (!($websiteField instanceof Zend_Db_Expr)) {
-            $websiteField = new Zend_Db_Expr($websiteField);
-        }
-
-        Mage::getResourseSingleton('cataloginventory/stock_status')
-            ->prepareCatalogProductIndexSelect($select, $entityField, $websiteField);
 
         return $this;
     }
